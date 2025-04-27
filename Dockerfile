@@ -1,31 +1,28 @@
+# Sử dụng PHP + Apache
 FROM php:8.1-apache
 
-# Install PHP extensions
+# Cài extension PHP cần thiết cho Laravel
 RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libicu-dev zlib1g-dev g++ \
-    libonig-dev libxslt1-dev libzip-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql intl zip xsl
+    git unzip libzip-dev libpng-dev libonig-dev libxml2-dev zip curl libcurl4-openssl-dev \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd xml curl
 
-# Install Composer
+# Cài Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy source
+# Copy toàn bộ source code vào container
 COPY . .
 
-# Copy env file
-RUN cp .env.example .env
-
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
-RUN npm install
-RUN npm run prod
-
-# Fix permissions
+# Set quyền thư mục storage và bootstrap/cache
 RUN chmod -R 777 storage bootstrap/cache
 
-# Expose port
+# Cài Laravel dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Expose port 80
 EXPOSE 80
+
+# Start Apache khi container khởi chạy
+CMD ["apache2-foreground"]
