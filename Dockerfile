@@ -1,42 +1,29 @@
-# Sử dụng PHP 8.1 + Apache image chính thức
+# Bước 1: Base image PHP + Apache
 FROM php:8.1-apache
 
-# Cài các extension PHP cần thiết
+# Bước 2: Cài extension PHP
 RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libjpeg-dev libfreetype6-dev zip libzip-dev libicu-dev zlib1g-dev g++ \
+    git unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libicu-dev zlib1g-dev g++ \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip intl
+    && docker-php-ext-install gd pdo pdo_mysql zip
 
-# Copy file .env.example thành .env để composer install không bị lỗi
-RUN cp .env.example .env
-# Cài Composer
+# Bước 3: Cài composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Làm việc trong /var/www/html
+# Bước 4: Copy toàn bộ source vào container
 WORKDIR /var/www/html
-
 COPY . .
 
-# Fix lỗi composer cần có file .env
+# Bước 5: Copy env mẫu
 RUN cp .env.example .env
 
+# Bước 6: Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run prod
 
-# Copy toàn bộ source code vào container
-COPY . .
-
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
-RUN npm install
-RUN npm run prod
-
-# Set quyền cho storage/bootstrap/cache
+# Bước 7: Fix quyền cho storage
 RUN chmod -R 777 storage bootstrap/cache
 
-# Expose port 80
+# Bước 8: Expose port
 EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
