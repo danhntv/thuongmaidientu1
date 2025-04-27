@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: bagisto-app
+    name: thuongmaidientu1
     env: php
     plan: free
     buildCommand: |
