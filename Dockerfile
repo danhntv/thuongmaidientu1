@@ -3,9 +3,10 @@ FROM php:8.1-apache
 
 # Cài các extension PHP cần thiết
 RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libjpeg-dev libfreetype6-dev zip \
+    git unzip libpng-dev libjpeg-dev libfreetype6-dev zip libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip
+
 
 # Cài Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
