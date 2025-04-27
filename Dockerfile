@@ -3,7 +3,7 @@ FROM php:8.1-apache
 
 # Cài các extension PHP cần thiết
 RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libjpeg-dev libfreetype6-dev zip libzip-dev \
+    git unzip libpng-dev libjpeg-dev libfreetype6-dev zip libzip-dev libicu-dev zlib1g-dev g++
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip
 
