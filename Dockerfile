@@ -7,11 +7,22 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip intl
 
+# Copy file .env.example thành .env để composer install không bị lỗi
+RUN cp .env.example .env
 # Cài Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Làm việc trong /var/www/html
 WORKDIR /var/www/html
+
+COPY . .
+
+# Fix lỗi composer cần có file .env
+RUN cp .env.example .env
+
+RUN composer install --no-dev --optimize-autoloader
+RUN npm install
+RUN npm run prod
 
 # Copy toàn bộ source code vào container
 COPY . .
